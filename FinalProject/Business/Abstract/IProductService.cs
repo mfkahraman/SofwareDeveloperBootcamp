@@ -1,4 +1,5 @@
-﻿using Entities.Concrete;
+﻿using Core.Utilities.Results;
+using Entities.Concrete;
 using Entities.DTOs;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,14 @@ namespace Business.Abstract
     //Business katmanı bu işlemlerin iş kurallarına uygun olup olmadığına bakar
     public interface IProductService
     {
-        List<Product> GetAll();
-        List<Product> GetAllByCategoryId(int id);
-        List<Product> GetByUnitPrice(decimal min, decimal max);
-        public List<ProductDetailDto> GetProductsDetails();
+        IDataResult<List<Product>> GetAll();
+        //Getall List<Product> return ediyordu ancak mesaj da return etmek istiyoruz. IResult return edersek datayı döndüremeyiz.
+        //Bu nedenle IDataResult interfacini oluşturduk. Bu sayede hem mesaj hem data döndürüyorz.
+        IDataResult<List<Product>> GetAllByCategoryId(int id);
+        IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max);
+        IDataResult<List<ProductDetailDto>> GetProductsDetails();
+        IDataResult<Product> GetById(int productId);
+        IResult Add (Product product);
+        //Add metodunda product vs. bir data döndürmemize gerek yok sadece mesaj döndüreceğimiz için IResult döndürüyoruz.
     }
 }

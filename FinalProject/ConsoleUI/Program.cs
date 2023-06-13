@@ -11,10 +11,11 @@ class Program
     {
         //InMemoryProductManagerTest();
 
-        EntityFrameworkProductManagerTest();
+        //EntityFrameworkProductManagerTest();
 
         //CategoryManagerTest();
 
+        ProductTest();
 
     }
 
@@ -25,7 +26,7 @@ class Program
         {
             Console.WriteLine(item.CategoryName);
         }
-        
+
         Console.WriteLine("\ncategoryManager.GetById(5).CategoryName: {0}", categoryManager.GetById(5).CategoryName);
     }
 
@@ -33,7 +34,9 @@ class Program
     {
         ProductManager inMemoryPM = new ProductManager(new InMemoryProductDal());
 
-        foreach (var product in inMemoryPM.GetAll())
+        var result = inMemoryPM.GetAll();
+
+        foreach (var product in result.Data)
         {
             Console.WriteLine(product.ProductName);
         }
@@ -43,25 +46,43 @@ class Program
     {
         ProductManager efPM = new ProductManager(new EfProductDal());
 
+
         Console.WriteLine("--------------efPM.GetAll()-----------------------");
-        foreach (var item in efPM.GetAll())
+        foreach (var item in efPM.GetAll().Data)
         {
             Console.WriteLine(item.ProductName);
         }
         Console.WriteLine("\n--------------------efPM.GetAllByCategoryId(2)---------------------");
-        foreach (var item in efPM.GetAllByCategoryId(2))
+        foreach (var item in efPM.GetAllByCategoryId(2).Data)
         {
             Console.WriteLine(item.ProductName);
         }
         Console.WriteLine("\n------------------efPM.GetByUnitPrice(40,1000)--------------------");
-        foreach (var item in efPM.GetByUnitPrice(40, 1000))
+        foreach (var item in efPM.GetByUnitPrice(40, 1000).Data)
         {
             Console.WriteLine(item.ProductName);
         }
-            Console.WriteLine("------------------------efPM.GetProductsDetails()-----------------------");
-        foreach (var item in efPM.GetProductsDetails())
+        Console.WriteLine("------------------------efPM.GetProductsDetails()-----------------------");
+        foreach (var item in efPM.GetProductsDetails().Data)
         {
-            Console.WriteLine("\nProductName: {0} / CategoryName: {1}",item.ProductName,item.CategoryName);
+            Console.WriteLine("\nProductName: {0} / CategoryName: {1}", item.ProductName, item.CategoryName);
         }
+    }
+
+    private static void ProductTest()
+    {
+        ProductManager productManager = new ProductManager(new EfProductDal());
+
+        var result = productManager.GetProductsDetails();
+
+        if (result.Success) // if (result.Success) == true demek, daha kısa yazılışı.
+        {
+            foreach (var product in result.Data)
+            {
+                Console.WriteLine(product.ProductName + "/" + product.CategoryName);
+            }
+        }
+        else
+            Console.WriteLine(result.Message);
     }
 }
