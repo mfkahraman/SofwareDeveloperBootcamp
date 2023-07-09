@@ -1,6 +1,7 @@
-﻿using DataAccess.Abstract;
-using Entities.Abstract;
+﻿using Core.DataAccess.EntityFramework;
+using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,67 +11,26 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Concrete.EntityFramework
 {
-    public class EfCarDal : ICarDal
+    public class EfCarDal : EfEntityRepositoryBase<Car, RCPContext>, ICarDal
     {
-        public void Add(Car entity)
+        public List<CarDetailDTO> GetCarDetails()
         {
             using (RCPContext context = new RCPContext())
             {
-                var addedEntity = context.Entry(entity);
-                addedEntity.State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                context.SaveChanges();
-            }
-        }
+                var result = from c in context.Cars
+                             join cl in context.Colors
+                             on c.ColorId equals cl.Id
+                             join b in context.Brands
+                             on c.BrandId equals b.Id
+                             select new CarDetailDTO
+                             {
+                                 CarName = c.Description,
+                                 BrandName = b.Name,
+                                 ColorName = cl.Name,
+                                 DailyPrice = c.DailyPrice
+                             };
+                return result.ToList();
 
-        public void Delete(Car entity)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                var deletedEntity = context.Entry(entity);
-                deletedEntity.State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-                context.SaveChanges();
-            }
-        }
-
-        public Car Get(Expression<Func<Car, bool>> filter)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                return context.Set<Car>().SingleOrDefault(filter);
-            }
-        }
-
-        public List<Car> GetAll(Expression<Func<Car, bool>> filter = null)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                return filter == null ? context.Set<Car>().ToList() : context.Set<Car>().Where(filter).ToList();
-            }
-        }
-
-        public List<Car> GetCarsByBrandId(int id)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                return context.Set<Car>().Where(p => p.BrandId == id).ToList();
-            }
-        }
-
-        public List<Car> GetCarsByColorId(int id)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                return context.Set<Car>().Where(p => p.ColorId == id).ToList();
-            }
-        }
-
-        public void Update(Car entity)
-        {
-            using (RCPContext context = new RCPContext())
-            {
-                var updatedEntity = context.Entry(entity);
-                updatedEntity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                context.SaveChanges();
             }
         }
     }
