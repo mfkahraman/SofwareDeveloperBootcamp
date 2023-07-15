@@ -15,8 +15,7 @@ class Program
 
         //CategoryManagerTest();
 
-        ProductTest();
-
+        //ProductTest();
     }
 
     private static void CategoryManagerTest()
