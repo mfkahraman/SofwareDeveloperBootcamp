@@ -22,12 +22,14 @@ class Program
 
         //Console.WriteLine(rentalManager.IsCarAvailable(1).Message);
 
-        Console.WriteLine(rentalManager.Rent(7, 2).Message);
-        Console.WriteLine(rentalManager.Rent(7, 2).Message);
+        //Console.WriteLine(rentalManager.Rent(7, 2).Message);
+        //Console.WriteLine(rentalManager.Rent(7, 2).Message);
 
         //Console.WriteLine(rentalManager.Return(2).Message);
 
-        //Console.WriteLine(rentalManager.IsCarAvailable(3).Message);
+        Console.WriteLine(rentalManager.IsCarAvailable(7).Message);
+        Console.WriteLine(rentalManager.IsCarAvailable(7).Success);
+
 
         // Console.WriteLine(rentalManager.Delete(new Rental { Id = 1}).Message);
     }
