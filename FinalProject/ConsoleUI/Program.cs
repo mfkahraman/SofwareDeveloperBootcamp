@@ -21,17 +21,17 @@ class Program
     private static void CategoryManagerTest()
     {
         CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
-        foreach (var item in categoryManager.GetAll())
+        foreach (var item in categoryManager.GetAll().Data)
         {
             Console.WriteLine(item.CategoryName);
         }
 
-        Console.WriteLine("\ncategoryManager.GetById(5).CategoryName: {0}", categoryManager.GetById(5).CategoryName);
+        Console.WriteLine("\ncategoryManager.GetById(5).CategoryName: {0}", categoryManager.GetById(5).Data.CategoryName);
     }
 
     private static void InMemoryProductManagerTest()
     {
-        ProductManager inMemoryPM = new ProductManager(new InMemoryProductDal());
+        ProductManager inMemoryPM = new ProductManager(new InMemoryProductDal(),new CategoryManager(new EfCategoryDal()));
 
         var result = inMemoryPM.GetAll();
 
@@ -43,7 +43,7 @@ class Program
 
     private static void EntityFrameworkProductManagerTest()
     {
-        ProductManager efPM = new ProductManager(new EfProductDal());
+        ProductManager efPM = new ProductManager(new EfProductDal(), new CategoryManager(new EfCategoryDal()));
 
 
         Console.WriteLine("--------------efPM.GetAll()-----------------------");
@@ -70,7 +70,7 @@ class Program
 
     private static void ProductTest()
     {
-        ProductManager productManager = new ProductManager(new EfProductDal());
+        ProductManager productManager = new ProductManager(new EfProductDal(), new CategoryManager(new EfCategoryDal()));
 
         var result = productManager.GetProductsDetails();
 

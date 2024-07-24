@@ -23,5 +23,7 @@ namespace Business.Abstract
         IDataResult<Product> GetById(int productId);
         IResult Add (Product product);
         //Add metodunda product vs. bir data döndürmemize gerek yok sadece mesaj döndüreceğimiz için IResult döndürüyoruz.
+
+        IResult Update (Product product);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Business.Abstract;
+using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -19,9 +21,14 @@ namespace Business.Concrete
         //Soyut katman için uygulanır bu nedenle InMemoryProductDal değil IProductDal kullandık
         IProductDal _productDal;
 
-        public ProductManager(IProductDal productDal)
+        //Bir entity manager kendisi hariç başka bir DALı enjekte etmez.
+        //Örneğin bu managere ICategoryDal enjeksiyonu yapamazsın böyle durumlarda servisi enjekte etmelisin.
+        ICategoryService _categoryService;
+
+        public ProductManager(IProductDal productDal,ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -60,15 +67,65 @@ namespace Business.Concrete
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductsDetails());
         }
 
-        //alttaki metodu ProductValidatordaki kurallara göre validation yapar
+        //alttaki attribute, metodu ProductValidatordaki kurallara göre validation yapar
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-            _productDal.Add(product);
+            IResult result = BusinessRules.Run(CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameAvailable(product.ProductName), CheckIfCategoryLimitExceeded(product.CategoryId));
 
+            //Run metodumuz parametre olarak gönderdiğimiz iş kuralı metodlarımızın sonucunda hata varsa
+            //hata alınan metodun sonucunu döndürür.
+
+            //Eğer sorun yoksa null döner. Yani null dönmesi gönderilen product tüm kurallardan geçiyor demek.
+            if (result != null)
+            {
+                return result;
+            }
+            _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
+
         }
 
+        public IResult Update(Product product)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
+            if (result < 10)
+            {
+                return new SuccessResult(Messages.CategoryIsAvailable);
+            }
+
+            else
+            {
+                return new ErrorResult(Messages.ProductCountOfCategoryError);
+            }
+        }
+
+        private IResult CheckIfProductNameAvailable(string productName)
+        {
+            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
+
+            if (result)
+                return new ErrorResult(Messages.ProductNameAlreadyExists);
+            else
+                return new SuccessResult(Messages.ProductNameIsAvailable);
+        }
+
+
+        private IResult CheckIfCategoryLimitExceeded(int categoryId)
+        {
+            var result = _categoryService.GetAll().Data.Count;
+
+            if (result >15)
+                return new ErrorResult(Messages.CategoryLimitExceeded);
+            else
+                return new SuccessResult(Messages.CategoryIsAvailable);
+        }
 
     }
 }
