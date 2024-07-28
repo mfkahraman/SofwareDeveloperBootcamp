@@ -7,7 +7,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ColorsController : Controller
+    public class ColorsController : ControllerBase
     {
         IColorService _colorservice;
         public ColorsController(IColorService colorservice)

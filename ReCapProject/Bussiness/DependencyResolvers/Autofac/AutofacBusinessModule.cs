@@ -3,6 +3,7 @@ using Autofac.Extras.DynamicProxy;
 using Bussiness.Abstract;
 using Bussiness.Concrete;
 using Castle.DynamicProxy;
+using Core.Utilities.Helpers.FileHelper;
 using Core.Utilities.Interceptors;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
@@ -36,6 +37,11 @@ namespace Bussiness.DependencyResolvers.Autofac
 
             builder.RegisterType<UserManager>().As<IUserService>();
             builder.RegisterType<EfUserDal>().As<IUserDal>();
+
+            builder.RegisterType<EfCarImageDal>().As<ICarImageDal>();
+            builder.RegisterType<CarImageManager>().As<ICarImageService>();
+
+            builder.RegisterType<FileHelperManager>().As<IFileHelperService>();
 
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
 
